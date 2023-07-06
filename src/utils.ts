@@ -1,5 +1,7 @@
 import * as core from '@actions/core'
 import * as github from '@actions/github'
+const os = require("os")
+const fs = require("fs")
 
 enum TimeUnit {
   S = 1000,
@@ -72,6 +74,12 @@ export function getArgs() {
 
 export function sleep(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+export function setOutput(key, value) {
+  // Temporary hack until core actions library catches up with github new recommendations
+  const output = process.env['GITHUB_OUTPUT']
+  fs.appendFileSync(output, `${key}=${value}${os.EOL}`)
 }
 
 export function isTimedOut(start: number, waitForCompletionTimeout: number) {
