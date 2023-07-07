@@ -7,7 +7,7 @@
 
 import * as core from '@actions/core'
 import * as github from '@actions/github'
-import { formatDuration, getArgs, isTimedOut, sleep } from './utils';
+import { setOutput, formatDuration, getArgs, isTimedOut, sleep } from './utils';
 import { WorkflowHandler, WorkflowRunConclusion, WorkflowRunResult, WorkflowRunStatus } from './workflow-handler';
 import { handleWorkflowLogsPerJob } from './workflow-logs-handler';
 
@@ -48,13 +48,13 @@ async function waitForCompletionOrTimeout(workflowHandler: WorkflowHandler, chec
 function computeConclusion(start: number, waitForCompletionTimeout: number, result?: WorkflowRunResult) {
   if (isTimedOut(start, waitForCompletionTimeout)) {
     core.info(`Workflow wait timed out`);
-    core.setOutput('workflow-conclusion', WorkflowRunConclusion.TIMED_OUT);
+    setOutput('workflow-conclusion', WorkflowRunConclusion.TIMED_OUT);
     throw new Error('Workflow run has failed due to timeout');
   }
 
   core.info(`Workflow completed with conclusion=${result?.conclusion}`);
   const conclusion = result?.conclusion;
-  core.setOutput('workflow-conclusion', conclusion);
+  setOutput('workflow-conclusion', conclusion);
 
   if (conclusion === WorkflowRunConclusion.FAILURE)   throw new Error('Workflow run has failed');
   if (conclusion === WorkflowRunConclusion.CANCELLED) throw new Error('Workflow run was cancelled');
@@ -85,7 +85,8 @@ async function run(): Promise<void> {
     if (args.displayWorkflowUrl) {
       const url = await getFollowUrl(workflowHandler, args.displayWorkflowUrlInterval, args.displayWorkflowUrlTimeout)
       core.info(`You can follow the running workflow here: ${url}`);
-      core.setOutput('workflow-url', url);
+      setOutput('workflow-url', url);
+
     }
 
     if (!args.waitForCompletion) {
@@ -97,7 +98,7 @@ async function run(): Promise<void> {
 
     await handleLogs(args, workflowHandler);
 
-    core.setOutput('workflow-url', result?.url);
+    setOutput('workflow-url', result?.url);
     computeConclusion(start, args.waitForCompletionTimeout, result);
 
   } catch (error: any) {

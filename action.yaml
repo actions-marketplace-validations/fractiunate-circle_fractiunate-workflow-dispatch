@@ -1,4 +1,4 @@
-name: 'Workflow Dispatch and wait'
+name: 'Workflow Dispatch and wait (Adapted)'
 description: 'Trigger and chain GitHub Actions workflows with workflow_dispatch events and wait for result'
 
 inputs:
@@ -48,6 +48,7 @@ inputs:
     description: 'Indicate what to do with logs of the triggered workflow. `ignore` do not retrieve logs from tiggered workflow. `print` retrieves logs from triggered workflow and print in the workflow that triggered the other workflow.'
     required: false
     default: ignore
+    # TODO: Show runtime, show finished jobs/steps?
 
 runs:
   using: 'node16'
